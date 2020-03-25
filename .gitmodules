@@ -1,0 +1,3 @@
+[submodule "ealstm_regional_modeling"]
+	path = ealstm_regional_modeling
+	url = git@github.com:kratzert/ealstm_regional_modeling
