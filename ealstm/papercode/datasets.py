@@ -60,7 +60,9 @@ class CamelsTXT(Dataset):
                  attribute_means: pd.Series = None,
                  attribute_stds: pd.Series = None,
                  concat_static: bool = False,
-                 db_path: str = None):
+                 db_path: str = None,
+                 reshape: bool = True,
+                 torchify: bool = True):
         self.camels_root = camels_root
         self.basin = basin
         self.seq_length = seq_length
@@ -71,6 +73,8 @@ class CamelsTXT(Dataset):
         self.attribute_stds = attribute_stds
         self.concat_static = concat_static
         self.db_path = db_path
+        self.reshape = reshape
+        self.torchify = torchify
 
         # placeholder to store std of discharge, used for rescaling losses during training
         self.q_std = None
@@ -93,7 +97,10 @@ class CamelsTXT(Dataset):
     def __getitem__(self, idx: int):
         if self.with_attributes:
             if self.concat_static:
-                x = torch.cat([self.x[idx], self.attributes.repeat((self.seq_length, 1))], dim=-1)
+                if self.reshape:
+                    x = torch.cat([self.x[idx], self.attributes.repeat((self.seq_length, 1))], dim=-1)
+                else:
+                    x = torch.cat([self.x[idx], self.attributes], dim=-1)
                 return x, self.y[idx]
             else:
                 return self.x[idx], self.attributes, self.y[idx]
@@ -125,7 +132,8 @@ class CamelsTXT(Dataset):
         # normalize data, reshape for LSTM training and remove invalid samples
         x = normalize_features(x, variable='inputs')
 
-        x, y = reshape_data(x, y, self.seq_length)
+        if self.reshape:
+            x, y = reshape_data(x, y, self.seq_length)
 
         if self.is_train:
             # Deletes all records, where no discharge was measured (-999)
@@ -143,9 +151,10 @@ class CamelsTXT(Dataset):
 
             y = normalize_features(y, variable='output')
 
-        # convert arrays to torch tensors
-        x = torch.from_numpy(x.astype(np.float32))
-        y = torch.from_numpy(y.astype(np.float32))
+        if self.torchify:
+            # convert arrays to torch tensors
+            x = torch.from_numpy(x.astype(np.float32))
+            y = torch.from_numpy(y.astype(np.float32))
 
         return x, y
 

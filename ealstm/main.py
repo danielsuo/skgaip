@@ -26,14 +26,14 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from papercode.datasets import CamelsH5, CamelsTXT
-from papercode.datautils import (add_camels_attributes, load_attributes,
+from ealstm.papercode.datasets import CamelsH5, CamelsTXT
+from ealstm.papercode.datautils import (add_camels_attributes, load_attributes,
                                  rescale_features)
-from papercode.ealstm import EALSTM
-from papercode.lstm import LSTM
-from papercode.metrics import calc_nse
-from papercode.nseloss import NSELoss
-from papercode.utils import create_h5_files, get_basin_list
+from ealstm.papercode.ealstm import EALSTM
+from ealstm.papercode.lstm import LSTM
+from ealstm.papercode.metrics import calc_nse
+from ealstm.papercode.nseloss import NSELoss
+from ealstm.papercode.utils import create_h5_files, get_basin_list
 
 ###########
 # Globals #
