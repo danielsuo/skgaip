@@ -18,8 +18,8 @@ def MSE(x, y):
     return ((x - y) ** 2).mean()
 
 
-def NSE(x, y):
-    return 1 - ((x - y) ** 2).sum() / ((x - x.mean()) ** 2).sum()
+def NSE(y_true, y_pred):
+    return 1 - ((y_true - y_pred) ** 2).sum() / ((y_true - y_true.mean()) ** 2).sum()
 
 
 class BatchedMeanSquareError(Loss):
