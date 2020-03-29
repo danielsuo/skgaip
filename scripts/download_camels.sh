@@ -23,6 +23,10 @@ $CAMELS_ROOT=basin_dataset_public_v1p2
 mv camels_attributes_v2 $CAMELS_ROOT
 mv maurer_extended $CAMELS_ROOT/basin_mean_forcing
 
+# Pre-trained models
+wget https://www.hydroshare.org/resource/83ea5312635e44dc824eeb99eda12f06/data/contents/Kratzert_et_al_2019_HESSD_LSTM_4_REGIONAL_MODELING.zip
+unzip Kratz*
+
 popd data
 
 # Create environment / update / install correct version of pytorch cuda
