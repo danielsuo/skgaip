@@ -1,7 +1,6 @@
 import json
 from pathlib import Path
 import jax.numpy as np
-from timecast.utils.losses.core import Loss
 
 from ealstm.main import GLOBAL_SETTINGS
 
@@ -22,12 +21,8 @@ def NSE(y_true, y_pred):
     return 1 - ((y_true - y_pred) ** 2).sum() / ((y_true - y_true.mean()) ** 2).sum()
 
 
-class BatchedMeanSquareError(Loss):
-    def __init__(self):
-        pass
-
-    def compute(self, y_pred: np.ndarray, y_true: np.ndarray):
-        return np.mean(np.mean((y_pred - y_true) ** 2, axis=tuple(range(1, y_true.ndim))))
+def BMSE(y_pred: np.ndarray, y_true: np.ndarray):
+    return np.mean(np.mean((y_pred - y_true) ** 2, axis=tuple(range(1, y_true.ndim))))
 
 
 def batch_window(X, window_size, offset=0):
