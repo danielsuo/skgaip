@@ -18,8 +18,13 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-from .datautils import (load_attributes, load_discharge, load_forcing,
-                        normalize_features, reshape_data)
+from .datautils import (
+    load_attributes,
+    load_discharge,
+    load_forcing,
+    normalize_features,
+    reshape_data,
+)
 
 
 class CamelsTXT(Dataset):
@@ -50,19 +55,21 @@ class CamelsTXT(Dataset):
         Path to sqlite3 database file, containing the catchment characteristics, by default None
     """
 
-    def __init__(self,
-                 camels_root: PosixPath,
-                 basin: str,
-                 dates: List,
-                 is_train: bool,
-                 seq_length: int = 270,
-                 with_attributes: bool = False,
-                 attribute_means: pd.Series = None,
-                 attribute_stds: pd.Series = None,
-                 concat_static: bool = False,
-                 db_path: str = None,
-                 reshape: bool = True,
-                 torchify: bool = True):
+    def __init__(
+        self,
+        camels_root: PosixPath,
+        basin: str,
+        dates: List,
+        is_train: bool,
+        seq_length: int = 270,
+        with_attributes: bool = False,
+        attribute_means: pd.Series = None,
+        attribute_stds: pd.Series = None,
+        concat_static: bool = False,
+        db_path: str = None,
+        reshape: bool = True,
+        torchify: bool = True,
+    ):
         self.camels_root = camels_root
         self.basin = basin
         self.seq_length = seq_length
@@ -98,7 +105,9 @@ class CamelsTXT(Dataset):
         if self.with_attributes:
             if self.concat_static:
                 if self.reshape:
-                    x = torch.cat([self.x[idx], self.attributes.repeat((self.seq_length, 1))], dim=-1)
+                    x = torch.cat(
+                        [self.x[idx], self.attributes.repeat((self.seq_length, 1))], dim=-1
+                    )
                 else:
                     x = torch.cat([self.x[idx], self.attributes], dim=-1)
                 return x, self.y[idx]
@@ -110,7 +119,7 @@ class CamelsTXT(Dataset):
     def _load_data(self) -> Tuple[torch.Tensor, torch.Tensor]:
         """Load input and output data from text files."""
         df, area = load_forcing(self.camels_root, self.basin)
-        df['QObs(mm/d)'] = load_discharge(self.camels_root, self.basin, area)
+        df["QObs(mm/d)"] = load_discharge(self.camels_root, self.basin, area)
 
         # we use (seq_len) time steps before start for warmup
         start_date = self.dates[0] - pd.DateOffset(days=self.seq_length - 1)
@@ -122,15 +131,20 @@ class CamelsTXT(Dataset):
         self.period_end = df.index[-1]
 
         # use all meteorological variables as inputs
-        x = np.array([
-            df['prcp(mm/day)'].values, df['srad(W/m2)'].values, df['tmax(C)'].values,
-            df['tmin(C)'].values, df['vp(Pa)'].values
-        ]).T
+        x = np.array(
+            [
+                df["prcp(mm/day)"].values,
+                df["srad(W/m2)"].values,
+                df["tmax(C)"].values,
+                df["tmin(C)"].values,
+                df["vp(Pa)"].values,
+            ]
+        ).T
 
-        y = np.array([df['QObs(mm/d)'].values]).T
+        y = np.array([df["QObs(mm/d)"].values]).T
 
         # normalize data, reshape for LSTM training and remove invalid samples
-        x = normalize_features(x, variable='inputs')
+        x = normalize_features(x, variable="inputs")
 
         if self.reshape:
             x, y = reshape_data(x, y, self.seq_length)
@@ -149,7 +163,7 @@ class CamelsTXT(Dataset):
             # store std of discharge before normalization
             self.q_std = np.std(y)
 
-            y = normalize_features(y, variable='output')
+            y = normalize_features(y, variable="output")
 
         if self.torchify:
             # convert arrays to torch tensors
@@ -195,13 +209,15 @@ class CamelsH5(Dataset):
         If True, no catchment attributes are added to the inputs, by default False
     """
 
-    def __init__(self,
-                 h5_file: PosixPath,
-                 basins: List,
-                 db_path: str,
-                 concat_static: bool = False,
-                 cache: bool = False,
-                 no_static: bool = False):
+    def __init__(
+        self,
+        h5_file: PosixPath,
+        basins: List,
+        db_path: str,
+        concat_static: bool = False,
+        cache: bool = False,
+        no_static: bool = False,
+    ):
         self.h5_file = h5_file
         self.basins = basins
         self.db_path = db_path
@@ -226,7 +242,7 @@ class CamelsH5(Dataset):
         if self.cache:
             self.num_samples = self.y.shape[0]
         else:
-            with h5py.File(h5_file, 'r') as f:
+            with h5py.File(h5_file, "r") as f:
                 self.num_samples = f["target_data"].shape[0]
 
     def __len__(self):
@@ -240,7 +256,7 @@ class CamelsH5(Dataset):
             q_std = self.q_stds[idx]
 
         else:
-            with h5py.File(self.h5_file, 'r') as f:
+            with h5py.File(self.h5_file, "r") as f:
                 x = f["input_data"][idx]
                 y = f["target_data"][idx]
                 basin = f["sample_2_basin"][idx]
@@ -272,7 +288,7 @@ class CamelsH5(Dataset):
                 return x, attributes, y, q_std
 
     def _preload_data(self):
-        with h5py.File(self.h5_file, 'r') as f:
+        with h5py.File(self.h5_file, "r") as f:
             x = f["input_data"][:]
             y = f["target_data"][:]
             str_arr = f["sample_2_basin"][:]
@@ -284,7 +300,7 @@ class CamelsH5(Dataset):
         if self.cache:
             basins = list(set(self.sample_2_basin))
         else:
-            with h5py.File(self.h5_file, 'r') as f:
+            with h5py.File(self.h5_file, "r") as f:
                 str_arr = f["sample_2_basin"][:]
             str_arr = [x.decode("ascii") for x in str_arr]
             basins = list(set(str_arr))
