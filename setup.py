@@ -1,6 +1,7 @@
 from setuptools import setup
+from setuptools import find_packages
 
 setup(
-    name="ealstm",
-    packages=["ealstm"]
+    name="skgaip",
+    packages=find_packages()
 )
