@@ -10,7 +10,7 @@ setup(
         "matplotlib",
         "tensorflow-gpu==1.15",
         "keras",
-        "pathos"
+        "pathos",
         "pandas",
         "numpy",
         "scipy",
@@ -18,6 +18,8 @@ setup(
         "jax",
         "jaxlib",
         "flax",
-    ]
-
+        "pixiedust",
+        "psycopg2",
+        "sqlalchemy",
+    ],
 )

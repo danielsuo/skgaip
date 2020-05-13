@@ -1,5 +1,9 @@
+# tspdb
+*.zip
+*LD2011*
+
 # Data
-.pkl
+*.pkl
 tmp
 data
 runs
