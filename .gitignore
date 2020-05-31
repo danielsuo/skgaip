@@ -1,3 +1,7 @@
+# files
+*.png
+*.pstats
+
 # tspdb
 *.zip
 *LD2011*
