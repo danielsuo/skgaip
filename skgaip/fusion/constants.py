@@ -1,0 +1,16 @@
+COLUMNS = [
+    "q95",
+    "internal_inductance",
+    "plasma_current",
+    "locked_mode_amplitude",
+    "norm_beta",
+    "stored_energy",
+    "plasma_density",
+    "radiated_power_core",
+    "radiated_power_edge",
+    "input_power",
+    "input_beam_torque",
+    "plasma_current_direction",
+    "plasma_current_target",
+    "plasma_current_error",
+]

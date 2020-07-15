@@ -18,6 +18,7 @@ setup(
         "jax",
         "jaxlib",
         "flax",
+        "binpacking",
         "pixiedust",
         "psycopg2",
         "sqlalchemy",
