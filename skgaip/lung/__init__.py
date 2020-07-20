@@ -334,9 +334,6 @@ class PaulaControllerWithHallucination:
         if t < 0.1 or t > 9.9:
             u = np.sum(self.errs) + self.bias
         else:
-            ### The weird rescaling below is to keep the same scale as Paula's controller
-            ### Ideally one can do a convex combination of past and hallucinated sum - allowing to weight either information in a tunable manner.
-            ### TODO: Implement that
             new_av = (np.sum(self.errs) + np.sum(hallucinated_errors)) * (
                 self.storage / (self.storage + len(hallucinated_errors))
             )
