@@ -1,3 +1,9 @@
 [submodule "ealstm_regional_modeling"]
 	path = ealstm_regional_modeling
 	url = git@github.com:kratzert/ealstm_regional_modeling
+[submodule "skgaip/lung/Ventilator-Dev"]
+	path = skgaip/lung/Ventilator-Dev
+	url = https://github.com/MinRegret/Ventilator-Dev
+[submodule "skgaip/lung/lung"]
+	path = skgaip/lung/cyril
+	url = git@github.com:danielsuo/lung
