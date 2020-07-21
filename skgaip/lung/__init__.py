@@ -225,33 +225,26 @@ def evaluate(controller, lung, waveform, allconf=allconf):
     return loss_values
 
 
-def benchmark(controlalg, do_plot=False, verbose=False):
-    loss_dict = {}
-    for C_lung in [6, 8, 10, 12, 14]:
-        for delay in [9, 12, 15, 18, 21]:
-            allconf["lung"]["C_lung"], allconf["lung"]["delay"] = C_lung, delay
+def benchmark(controlalg, C_lung, delay, do_plot=False, verbose=False):
+    allconf["lung"]["C_lung"], allconf["lung"]["delay"] = C_lung, delay
 
-            lung = DelayLung(**allconf["lung"])
-            waveform = BreathWaveform(allconf["waveform"]["lohi"], allconf["waveform"]["keypoints"])
-            controller = controlalg(waveform)
-            loss_values = evaluate(controller, lung, waveform, allconf)
-            mean_loss = np.mean(loss_values)
-            if verbose:
-                print(f"Loss Value with {delay} delay, {C_lung} C_lung = {mean_loss}")
-            loss_dict[(delay, C_lung)] = mean_loss
-
-            if do_plot:
-                T, dt = allconf["time"]["T"], allconf["time"]["dt"]
-                tt = np.arange(T // dt) * dt
-                plt.figure(figsize=(10, 4))
-                plt.plot(tt, waveform.at(tt), c="k", ls="--")
-                plt.plot(tt, lung.pressures, c="b")
-                plt.twinx().plot(tt, lung.controls_in, c="gray")
-                plt.title(f"Loss Value with {delay} delay, {C_lung} C_lung = {mean_loss}")
-    total_mean_loss = np.mean([l for k, l in loss_dict.items()])
+    lung = DelayLung(**allconf["lung"])
+    waveform = BreathWaveform(allconf["waveform"]["lohi"], allconf["waveform"]["keypoints"])
+    controller = controlalg(waveform)
+    loss_values = evaluate(controller, lung, waveform, allconf)
+    mean_loss = np.mean(loss_values)
     if verbose:
-        print(f"Across {len(loss_dict)} runs, mean error is {total_mean_loss}")
-    return total_mean_loss
+        print(f"Loss Value with {delay} delay, {C_lung} C_lung = {mean_loss}")
+
+    if do_plot:
+        T, dt = allconf["time"]["T"], allconf["time"]["dt"]
+        tt = np.arange(T // dt) * dt
+        plt.figure(figsize=(10, 4))
+        plt.plot(tt, waveform.at(tt), c="k", ls="--")
+        plt.plot(tt, lung.pressures, c="b")
+        plt.twinx().plot(tt, lung.controls_in, c="gray")
+        plt.title(f"Loss Value with {delay} delay, {C_lung} C_lung = {mean_loss}")
+    return {"C_lung": C_lung, "delay": delay, "loss": mean_loss}
 
 
 class LinearForecaster:
@@ -339,4 +332,3 @@ class PaulaControllerWithHallucination:
             )
             u = new_av + self.bias
         return u
-
