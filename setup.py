@@ -8,7 +8,7 @@ setup(
         "timecast-nightly",
         "sklearn",
         "matplotlib",
-        "tensorflow-gpu==1.15",
+        "tensorflow-gpu==2.5.1",
         "keras",
         "pathos",
         "pandas",
